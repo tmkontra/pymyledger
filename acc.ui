@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PyLedger</class>
+ <widget class="QMainWindow" name="PyLedger">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>979</width>
+    <height>744</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="main_widget">
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>8</y>
+      <width>961</width>
+      <height>551</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="grid" columnstretch="0,0,0">
+     <item row="6" column="0">
+      <widget class="QTableWidget" name="static_table"/>
+     </item>
+     <item row="7" column="0" alignment="Qt::AlignHCenter">
+      <widget class="QPushButton" name="add_static">
+       <property name="text">
+        <string>Add Static Line Item</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QLabel" name="variable_label">
+       <property name="text">
+        <string>Variable</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="static_label">
+       <property name="text">
+        <string>Static</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <spacer name="ledger_spacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="new_month">
+       <property name="text">
+        <string>New Month</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <layout class="QHBoxLayout" name="month_button_layout">
+       <item>
+        <widget class="QComboBox" name="month_select"/>
+       </item>
+      </layout>
+     </item>
+     <item row="7" column="2" alignment="Qt::AlignHCenter">
+      <widget class="QPushButton" name="add_variable">
+       <property name="text">
+        <string>Add Variable Line Item</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="QTableWidget" name="variable_table"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="gridLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>590</y>
+      <width>151</width>
+      <height>85</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="1">
+      <widget class="QLabel" name="liabilities_text">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="assets_text">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="liabilities_label">
+       <property name="text">
+        <string>Liabilities</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="assets_label">
+       <property name="text">
+        <string>Assets</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="balance_label">
+       <property name="text">
+        <string>Balance</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="balance_text">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>979</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuLedger">
+    <property name="title">
+     <string>Ledger</string>
+    </property>
+   </widget>
+   <addaction name="menuLedger"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

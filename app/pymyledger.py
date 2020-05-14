@@ -1,0 +1,57 @@
+from datetime import datetime
+import signal
+from PyQt5 import QtWidgets, QtCore
+
+from ui import ApplicationWindow
+
+from model import Data, Profile, Ledger, MonthKey
+
+class PyMyLedger:
+    _default_profile_name = "My Profile"
+
+    def __init__(self, args=None, **kwargs):
+        args = args or []
+        self._qt: QtWidgets.QApplication = QtWidgets.QApplication(args)
+        self._window: ApplicationWindow = ApplicationWindow()
+        data = kwargs.get("data")
+        self._set_data(data)
+        self._register_signal_handlers()
+        self._start_timer()
+        self._window.show()
+        self._qt.exec()
+
+    def _set_data(self, data=None):
+        if data is None:
+            data = self.default_data
+        self._window.set_data(data)
+
+    @property
+    def default_data(self):
+        print("initializing data...")
+        data = Data(Profile(self._default_profile_name), Ledger())
+        data.add_month(MonthKey.from_date(datetime.now()))
+        return data
+
+    def _register_signal_handlers(self):
+        signal.signal(signal.SIGINT, self.sigint_handler)
+        signal.signal(signal.SIGQUIT, self.sigquit_handler)
+
+    @staticmethod
+    def sigint_handler(*args):
+        """Handler for the SIGINT signal."""
+        self._qt.quit()
+
+    @staticmethod
+    def sigquit_handler(*args):
+        print("\n")
+        print("Profile")
+        print(my_data.profile.__dict__)
+        print("Ledger")
+        print(my_data.ledger.months)
+        print("\n")
+
+    def _start_timer(self):
+        timer = QtCore.QTimer()
+        timer.start(500)  # You may change this if you wish.
+        timer.timeout.connect(lambda: None)  # Let the interpreter run each 500 ms.
+        self.timer = timer
