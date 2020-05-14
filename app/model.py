@@ -1,9 +1,11 @@
 from dataclasses import dataclass, field
 import datetime
 import itertools
+import pickle
 from typing import List
 
 from copy import deepcopy
+
 
 @dataclass(frozen=True)
 class MonthKey:
@@ -47,38 +49,10 @@ class MonthBudget:
     variable: List[VariableLineItem] = field(default_factory=list)
 
 
-my_static = [
-    StaticLineItem("Rent", -1975),
-    StaticLineItem("Student Loan", -450),
-    StaticLineItem("VW Lease", -360),
-    StaticLineItem("Utilities", -120),
-    StaticLineItem("Paycheck", 6000)
-]
-
-my_variable = [
-    VariableLineItem("Freedom Unlimited"),
-    VariableLineItem("Sapphire"),
-    VariableLineItem("United"),
-    VariableLineItem("Amazon"),
-    VariableLineItem("Citi AA"),
-]
-
-my_profile = Profile("Tyler", my_static, my_variable)
-
-
 @dataclass
 class Ledger:
     months: dict = field(default_factory=dict)
 
-
-my_ledger = Ledger(
-    {
-        (2020, 1): MonthBudget(
-            deepcopy(my_static), 
-            [VariableLineItem(v.name, -120) for v in my_variable]
-        )
-    }
-)
 
 @dataclass
 class Data:
@@ -119,13 +93,18 @@ class Data:
             return months
         return []
 
-    def add_static_to_month(month, static):
+    def add_static_to_month(self, month, static):
         self.ledger.months[month].static.append(static)
 
-    def add_variable_to_month(month, variable):
+    def add_variable_to_month(self, month, variable):
         self.ledger.months[month].variable.append(variable)
 
-
-
-
-my_data = Data(deepcopy(my_profile), deepcopy(my_ledger))
+    def save(self, fp):
+        with open(fp, 'wb') as f:
+            pickle.dump(self, f)
+    
+    @classmethod
+    def load(cls, fp):
+        with open(fp, 'rb') as f:
+            data = pickle.load(f)
+        return data

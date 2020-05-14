@@ -39,15 +39,15 @@ class PyMyLedger:
     @staticmethod
     def sigint_handler(*args):
         """Handler for the SIGINT signal."""
-        self._qt.quit()
+        print("Goodbye!")
+        QtWidgets.QApplication.quit()
 
-    @staticmethod
-    def sigquit_handler(*args):
+    def sigquit_handler(self, *args):
         print("\n")
         print("Profile")
-        print(my_data.profile.__dict__)
+        print(self._window.data.profile.__dict__)
         print("Ledger")
-        print(my_data.ledger.months)
+        print(self._window.data.ledger.months)
         print("\n")
 
     def _start_timer(self):

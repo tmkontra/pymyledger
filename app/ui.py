@@ -3,7 +3,6 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 
 from datetime import datetime
-import itertools
 import signal
 import pprint
 
@@ -32,6 +31,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.ui = Ui_PyLedger()
         self.ui.setupUi(self)
         self._set_window_title()
+        self.save_load = SaveLoad(self)
 
         self.ui.new_month.clicked.connect(self._on_new_month_press)
         self.ui.add_static.clicked.connect(self._on_new_static_press)
@@ -85,7 +85,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         dialog.open()
 
     def _add_month(self, date):
-        month_key = (date.year, date.month)
+        month_key = MonthKey.from_date(date)
         print("adding month:", month_key)
         self.data.add_month(month_key)
         self.set_data()
@@ -119,6 +119,35 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.data.add_variable_to_month(self._current_month, variable)
         self.set_data()
 
+class SaveLoad(QtWidgets.QWidget):
+    def __init__(self, app, parent=None):
+        super(SaveLoad, self).__init__(parent)
+        self.app = app
+        self.app.ui.save_button.clicked.connect(self._on_save_press)
+        self.app.ui.load_button.clicked.connect(self._on_load_press)
+
+    def _on_save_press(self):
+        print("opening save dialog")
+        (path, _) = QtWidgets.QFileDialog.getSaveFileName(self, "Save to file", "", "PyMyLedger files (*.pml)")
+        try:
+            print("got path", path)
+            self.app.data.save(path)
+        except Exception as e:
+            print("Unable to save data!")
+            raise
+
+    def _on_load_press(self):
+        print("opening load dialog")
+        (path, _) = QtWidgets.QFileDialog.getOpenFileName(self, "Save to file", "", "PyMyLedger files (*.pml)")
+        try:
+            data = Data.load(path)
+        except Exception as e:
+            print("Unable to load data!")
+            raise
+            data = None
+        self.app.set_data(data)       
+    
+    
 
 class MonthWindow(QtWidgets.QDialog):
     def __init__(self, cb):
