@@ -12,6 +12,7 @@ class PyMyLedger:
     def __init__(self, args=None, **kwargs):
         args = args or []
         self._qt: QtWidgets.QApplication = QtWidgets.QApplication(args)
+        self._qt.setApplicationDisplayName("PyMyLedger")
         self._window: ApplicationWindow = ApplicationWindow()
         data = kwargs.get("data")
         self._set_data(data)
@@ -47,7 +48,9 @@ class PyMyLedger:
         print("Profile")
         print(self._window.data.profile.__dict__)
         print("Ledger")
-        print(self._window.data.ledger.months)
+        for m, v in self._window.data.ledger.months.items():
+            print(m)
+            print(v)
         print("\n")
 
     def _start_timer(self):

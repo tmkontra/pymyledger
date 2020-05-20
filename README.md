@@ -7,6 +7,8 @@ PyMyLedger is a minimal desktop application that aims to make it easy to quickly
 1. I wanted easier data-entry for expenses.
 2. I wanted to try making a python desktop app.
 
+![Application Screenshot](/docs/screen-shot-1.png)
+
 ## Overview
 
 PyMyLedger is developed using python3.7 and requires a python3.5+ runtime (for dataclasses).
@@ -14,6 +16,19 @@ PyMyLedger is developed using python3.7 and requires a python3.5+ runtime (for d
 PyMyLedger is a PyQt5 application. PyQt5 is the only dependency. 
 
 Serialization (save/load) is implemented via naive pickle.
+
+## Installation
+
+At present, there is no graphical installer or package distribution of PyMyLedger.
+
+To install PyMyLedger:
+
+1. Clone/download this repo
+2. Run `pipenv install` in the repo root.
+
+To run PyMyLedger:
+
+> `pipenv run python app/main.py`
 
 ## Roadmap
 

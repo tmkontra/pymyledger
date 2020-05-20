@@ -42,6 +42,14 @@ class Profile:
     name: str
     static: List[StaticLineItem] = field(default_factory=list)
     variable: List[VariableLineItem] = field(default_factory=list)
+    
+    @property
+    def static_names(self):
+        return [s.name for s in self.static]
+
+    @property
+    def variable_names(self):
+        return [v.name for v in self.variable]
 
 @dataclass
 class MonthBudget:
@@ -60,7 +68,7 @@ class Data:
     ledger: Ledger
 
     def add_month(self, month: MonthKey):
-        self.ledger.months.setdefault(month, MonthBudget(self.profile.static, self.profile.variable))
+        self.ledger.months.setdefault(month, MonthBudget(deepcopy(self.profile.static), deepcopy(self.profile.variable)))
     
     def assets_and_liabilities(self, month: MonthKey):
         budget = self.ledger.months.get(month)
@@ -87,17 +95,50 @@ class Data:
     @property
     def months_available(self):
         months = list(self.ledger.months.keys())
-        print("sorting months:", months)
         if months:
             months.sort(key=lambda x: (-x.year, -x.month))
             return months
         return []
 
     def add_static_to_month(self, month, static):
-        self.ledger.months[month].static.append(static)
+        if static.name in self.profile.static_names:
+            raise ValueError
+        else:
+            self.profile.static.append(static)
+            self.ledger.months[month].static.append(static)
 
     def add_variable_to_month(self, month, variable):
-        self.ledger.months[month].variable.append(variable)
+        if variable.name in self.profile.variable_names:
+            raise ValueError
+        else:
+            self.profile.variable.append(variable)
+            self.ledger.months[month].variable.append(variable)
+
+    def update_variable(self, month, name, amount=None):
+        if amount:
+            variable = self.ledger.months[month].variable
+            for var in variable:
+                if var.name == name:
+                    var.amount = amount
+    
+    def get_variable(self, month, name):
+        variable = self.ledger.months[month].variable
+        for var in variable:
+            if var.name == name:
+                return var
+
+    def update_static(self, month, name, amount=None, paid=None):
+        static = self.ledger.months[month].static
+        for stat in static:
+            if stat.name == name:
+                stat.amount = amount or stat.amount
+                stat.paid = paid if paid is not None else stat.paid
+
+    def get_static(self, month, name):
+        static = self.ledger.months[month].static
+        for stat in static:
+            if stat.name == name:
+                return stat
 
     def save(self, fp):
         with open(fp, 'wb') as f:
