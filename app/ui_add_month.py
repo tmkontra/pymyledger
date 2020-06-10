@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'month.ui'
+# Form implementation generated from reading ui file 'resource/month.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.2
 #
@@ -27,6 +27,9 @@ class Ui_AddMonth(object):
         self.dateEdit.setReadOnly(False)
         self.dateEdit.setDateTime(QtCore.QDateTime(QtCore.QDate(2020, 1, 1), QtCore.QTime(0, 0, 0)))
         self.dateEdit.setObjectName("dateEdit")
+        self.instruction = QtWidgets.QLabel(AddMonth)
+        self.instruction.setGeometry(QtCore.QRect(60, 10, 191, 21))
+        self.instruction.setObjectName("instruction")
 
         self.retranslateUi(AddMonth)
         self.buttonBox.accepted.connect(AddMonth.accept)
@@ -37,3 +40,4 @@ class Ui_AddMonth(object):
         _translate = QtCore.QCoreApplication.translate
         AddMonth.setWindowTitle(_translate("AddMonth", "Dialog"))
         self.dateEdit.setDisplayFormat(_translate("AddMonth", "MMM yyyy"))
+        self.instruction.setText(_translate("AddMonth", "Please Select A Month To Start:"))

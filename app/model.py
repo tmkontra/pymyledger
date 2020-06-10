@@ -24,6 +24,13 @@ class MonthKey:
     def month_format(cls):
         return "%b %Y"
 
+    @property
+    def prev(self):
+        if self.month > 1:
+            return MonthKey(self.year, self.month - 1)
+        else:
+            return MonthKey(self.year - 1, 12)
+
 @dataclass
 class LineItem:
     name: str
@@ -38,20 +45,6 @@ class VariableLineItem(LineItem):
     pass
 
 @dataclass
-class Profile:
-    name: str
-    static: List[StaticLineItem] = field(default_factory=list)
-    variable: List[VariableLineItem] = field(default_factory=list)
-    
-    @property
-    def static_names(self):
-        return [s.name for s in self.static]
-
-    @property
-    def variable_names(self):
-        return [v.name for v in self.variable]
-
-@dataclass
 class MonthBudget:
     static: List[StaticLineItem] = field(default_factory=list)
     variable: List[VariableLineItem] = field(default_factory=list)
@@ -64,11 +57,17 @@ class Ledger:
 
 @dataclass
 class Data:
-    profile: Profile
     ledger: Ledger
 
     def add_month(self, month: MonthKey):
-        self.ledger.months.setdefault(month, MonthBudget(deepcopy(self.profile.static), deepcopy(self.profile.variable)))
+        static, variable = self.static_and_variable(month.prev)
+        self.ledger.months.setdefault(
+            month, 
+            MonthBudget(
+                [s for s in static], 
+                [VariableLineItem(v.name) for v in variable]
+            )
+        )
     
     def assets_and_liabilities(self, month: MonthKey):
         budget = self.ledger.months.get(month)
@@ -101,18 +100,18 @@ class Data:
         return []
 
     def add_static_to_month(self, month, static):
-        if static.name in self.profile.static_names:
+        static_list, _ = self.static_and_variable(month)
+        if static.name in static_list:
             raise ValueError
         else:
-            self.profile.static.append(static)
-            self.ledger.months[month].static.append(static)
+            static_list.append(static)
 
     def add_variable_to_month(self, month, variable):
-        if variable.name in self.profile.variable_names:
+        _, variable_list = self.static_and_variable(month)
+        if variable.name in variable_list:
             raise ValueError
         else:
-            self.profile.variable.append(variable)
-            self.ledger.months[month].variable.append(variable)
+            variable_list.append(variable)
 
     def update_variable(self, month, name, amount=None):
         if amount:

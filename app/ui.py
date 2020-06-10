@@ -4,14 +4,14 @@ from PyQt5.QtCore import Qt
 
 from datetime import datetime
 import signal
+from pathlib import Path
 import pprint
 
 from ui_pyledger import Ui_PyLedger
 from ui_add_month import Ui_AddMonth
 from ui_new_static import Ui_NewStatic
 from ui_new_variable import Ui_NewVariable
-from model import Profile, StaticLineItem, VariableLineItem, Ledger, Data, MonthBudget, MonthKey
-
+from model import StaticLineItem, VariableLineItem, Ledger, Data, MonthBudget, MonthKey
 
 def date_from_qdatetime(qdt):
     return qdt.toPyDateTime().date()
@@ -47,14 +47,14 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.ui.variable_table.cellChanged.connect(self._on_variable_cell_change)
 
     def set_data(self, data=None):
-        self.data = data or self.data
+        self.data: Data = data or self.data
         self._populate_month_select()
         self._set_window_title()
         self._load_month()
 
     def _set_window_title(self):
         if self.data:
-            title = self._window_title + " | " + self.data.profile.name
+            title = self._window_title + " | " + "PROFILE"
         else:
             title = self._window_title
         self.setWindowTitle(title)        
@@ -85,8 +85,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.ui.liabilities_text.setText(str(liabilities))
         self.ui.balance_text.setText(str(balance))
 
-    def _on_new_month_press(self):
-        dialog = MonthWindow(self._add_month)
+    def _on_new_month_press(self, instruction=None):
+        dialog = MonthWindow(self._add_month, instruction)
         dialog.open()
 
     def _add_month(self, date):
@@ -182,25 +182,30 @@ class SaveLoad(QtWidgets.QWidget):
         self.app = app
         self.app.ui.save_button.clicked.connect(self._on_save_press)
         self.app.ui.load_button.clicked.connect(self._on_load_press)
+        self.last_opened = None
 
     def _on_save_press(self):
         print("opening save dialog")
-        (path, _) = QtWidgets.QFileDialog.getSaveFileName(self, "Save to file", "", "PyMyLedger files (*.pml)")
+        homedir = str(Path.home())
+        (path, _) = QtWidgets.QFileDialog.getSaveFileName(self, "Save to file", homedir, "PyMyLedger files (*.pml)")
         if path:
             try:
                 print("got path", path)
                 self.app.data.save(path)
+                self.last_opened = path
             except Exception as e:
                 print("Unable to save data!")
                 raise
 
     def _on_load_press(self):
         print("opening load dialog")
-        (path, _) = QtWidgets.QFileDialog.getOpenFileName(self, "Save to file", "", "PyMyLedger files (*.pml)")
+        homedir = str(Path.home())
+        (path, _) = QtWidgets.QFileDialog.getOpenFileName(self, "Save to file", homedir, "PyMyLedger files (*.pml)")
         if path:
             try:
                 data = Data.load(path)
                 print("loaded data:", data)
+                self.last_opened = path
             except Exception as e:
                 print("Unable to load data!")
                 raise
@@ -210,13 +215,17 @@ class SaveLoad(QtWidgets.QWidget):
     
 
 class MonthWindow(QtWidgets.QDialog):
-    def __init__(self, cb):
+    def __init__(self, cb, instruction=None):
         super(MonthWindow, self).__init__()
 
         self.ui = Ui_AddMonth()
         self.ui.setupUi(self)
+    
         now = datetime.now()
         self.ui.dateEdit.setDateTime(QtCore.QDateTime(QtCore.QDate(now.year, now.month, now.day), QtCore.QTime(0, 0, 0)))
+
+        self.instruction: str = instruction
+        self.ui.instruction.setText(instruction or "")
 
         self.callback = cb
         self.ui.buttonBox.clicked.connect(self._on_new_month_select)
@@ -244,7 +253,10 @@ class StaticWindow(QtWidgets.QDialog):
 
     def _on_submit(self, *args, **kwargs):
         name = self.ui.name_text.text()
-        amount = int(self.ui.amount_text.text())
+        try:
+            amount = int(self.ui.amount_text.text())
+        except ValueError:
+            return
         new = StaticLineItem(name, amount)
         self.callback(new)
 
@@ -268,6 +280,8 @@ class VariableWindow(QtWidgets.QDialog):
     
     def _on_submit(self, *args, **kwargs):
         name = self.ui.name_text.text()
+        if name == '':
+            return
         new = VariableLineItem(name)
         self.callback(new)
 

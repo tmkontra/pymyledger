@@ -60,6 +60,19 @@
     <string>MMM yyyy</string>
    </property>
   </widget>
+  <widget class="QLabel" name="instruction">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>10</y>
+     <width>191</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Please Select A Month To Start:</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>

@@ -2,35 +2,60 @@ from datetime import datetime
 import signal
 from PyQt5 import QtWidgets, QtCore
 
-from ui import ApplicationWindow
+from ui import ApplicationWindow, MonthWindow
 
-from model import Data, Profile, Ledger, MonthKey
+from cache import Cache
+from model import Data, Ledger, MonthKey
 
 class PyMyLedger:
     _default_profile_name = "My Profile"
+    _appname = "PyMyLedger"
 
     def __init__(self, args=None, **kwargs):
         args = args or []
         self._qt: QtWidgets.QApplication = QtWidgets.QApplication(args)
-        self._qt.setApplicationDisplayName("PyMyLedger")
+        self._qt.setApplicationDisplayName(self._appname)
+        
+        self.cache = Cache(self._appname)
+
+        last_open = self.cache.get("last_opened")
+        if last_open:
+            try:
+                data = Data.load(last_open)
+            except:
+                data = None
+        else:
+            data = None
+
         self._window: ApplicationWindow = ApplicationWindow()
-        data = kwargs.get("data")
         self._set_data(data)
         self._register_signal_handlers()
         self._start_timer()
         self._window.show()
         self._qt.exec()
+        self.on_shutdown()
 
     def _set_data(self, data=None):
         if data is None:
             data = self.default_data
+            needs_month = True
+        else:
+            needs_month = False
         self._window.set_data(data)
+        if needs_month:
+            self._window._on_new_month_press("Please Select A Month To Start:")
+
+    def on_shutdown(self):
+        lo = self._window.save_load.last_opened
+        if lo:
+            print("caching last file location")
+            self.cache.update("last_opened", lo)
+            self.cache.flush()
 
     @property
     def default_data(self):
         print("initializing data...")
-        data = Data(Profile(self._default_profile_name), Ledger())
-        data.add_month(MonthKey.from_date(datetime.now()))
+        data = Data(Ledger())
         return data
 
     def _register_signal_handlers(self):

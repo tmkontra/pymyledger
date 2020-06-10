@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'acc.ui'
+# Form implementation generated from reading ui file 'resource/acc.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.2
 #
@@ -13,11 +13,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_PyLedger(object):
     def setupUi(self, PyLedger):
         PyLedger.setObjectName("PyLedger")
-        PyLedger.resize(979, 744)
+        PyLedger.resize(777, 616)
+        PyLedger.setMaximumSize(QtCore.QSize(777, 616))
         self.main_widget = QtWidgets.QWidget(PyLedger)
         self.main_widget.setObjectName("main_widget")
         self.gridLayoutWidget = QtWidgets.QWidget(self.main_widget)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(8, 8, 961, 551))
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(8, 8, 761, 451))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.grid = QtWidgets.QGridLayout(self.gridLayoutWidget)
         self.grid.setContentsMargins(0, 0, 0, 0)
@@ -56,7 +57,7 @@ class Ui_PyLedger(object):
         self.variable_table.setRowCount(0)
         self.grid.addWidget(self.variable_table, 6, 2, 1, 1)
         self.gridLayoutWidget_2 = QtWidgets.QWidget(self.main_widget)
-        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(410, 590, 151, 85))
+        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(310, 470, 151, 85))
         self.gridLayoutWidget_2.setObjectName("gridLayoutWidget_2")
         self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
@@ -90,7 +91,7 @@ class Ui_PyLedger(object):
         self.balance_text.setObjectName("balance_text")
         self.gridLayout.addWidget(self.balance_text, 3, 1, 1, 1)
         self.verticalLayoutWidget = QtWidgets.QWidget(self.main_widget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(730, 590, 171, 81))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(520, 480, 171, 81))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.save_load_layout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.save_load_layout.setContentsMargins(0, 0, 0, 0)
@@ -110,7 +111,7 @@ class Ui_PyLedger(object):
         self.save_load_layout.addWidget(self.save_button, 0, QtCore.Qt.AlignHCenter)
         PyLedger.setCentralWidget(self.main_widget)
         self.menubar = QtWidgets.QMenuBar(PyLedger)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 979, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 777, 22))
         self.menubar.setObjectName("menubar")
         self.menuLedger = QtWidgets.QMenu(self.menubar)
         self.menuLedger.setObjectName("menuLedger")
