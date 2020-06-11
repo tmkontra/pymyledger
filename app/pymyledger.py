@@ -9,6 +9,7 @@ from .model import Data, Ledger, MonthKey
 from .serialize import Serializer
 from .ui import ApplicationWindow, MonthWindow
 
+
 class PyMyLedger:
     _default_profile_name = "My Profile"
     _appname = "PyMyLedger"
@@ -17,7 +18,7 @@ class PyMyLedger:
         args = args or []
         self._qt: QtWidgets.QApplication = QtWidgets.QApplication(args)
         self._qt.setApplicationDisplayName(self._appname)
-        
+
         self.cache = Cache(self._appname)
 
         last_open = self.cache.get("last_opened")
@@ -57,7 +58,7 @@ class PyMyLedger:
         print("initializing data...")
         data = Data(Ledger())
         return data
-    
+
     def load(self, fp):
         try:
             return Serializer(fp).load()

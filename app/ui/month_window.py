@@ -4,15 +4,20 @@ from PyQt5 import QtWidgets, QtCore
 
 from .gen.ui_add_month import Ui_AddMonth
 
+
 class MonthWindow(QtWidgets.QDialog):
     def __init__(self, cb, instruction=None):
         super(MonthWindow, self).__init__()
 
         self.ui = Ui_AddMonth()
         self.ui.setupUi(self)
-    
+
         now = datetime.now()
-        self.ui.dateEdit.setDateTime(QtCore.QDateTime(QtCore.QDate(now.year, now.month, now.day), QtCore.QTime(0, 0, 0)))
+        self.ui.dateEdit.setDateTime(
+            QtCore.QDateTime(
+                QtCore.QDate(now.year, now.month, now.day), QtCore.QTime(0, 0, 0)
+            )
+        )
 
         self.instruction: str = instruction
         self.ui.instruction.setText(instruction or "")

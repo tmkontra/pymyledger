@@ -13,17 +13,17 @@ class VariableWindow(QtWidgets.QDialog):
 
         self.callback = cb(self)
         self.ui.buttonBox.clicked.connect(self._on_submit)
-    
+
     def open(self):
         self.show()
         self.activateWindow()
         self.raise_()
         self.setFocus()
         self.exec_()
-    
+
     def _on_submit(self, *args, **kwargs):
         name = self.ui.name_text.text()
-        if name == '':
+        if name == "":
             return
         new = VariableLineItem(name)
         self.callback(new)

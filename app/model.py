@@ -17,7 +17,9 @@ class MonthKey:
 
     @property
     def display(self):
-        return datetime.datetime(year=self.year, month=self.month, day=1).strftime(self.month_format())
+        return datetime.datetime(year=self.year, month=self.month, day=1).strftime(
+            self.month_format()
+        )
 
     @classmethod
     def month_format(cls):
@@ -29,7 +31,7 @@ class MonthKey:
             return MonthKey(self.year, self.month - 1)
         else:
             return MonthKey(self.year - 1, 12)
-            
+
 
 @dataclass
 class LineItem:
@@ -45,6 +47,7 @@ class StaticLineItem(LineItem):
 @dataclass
 class VariableLineItem(LineItem):
     pass
+
 
 @dataclass
 class MonthBudget:
@@ -64,13 +67,12 @@ class Data:
     def add_month(self, month: MonthKey):
         static, variable = self.static_and_variable(month.prev)
         self.ledger.months.setdefault(
-            month, 
+            month,
             MonthBudget(
-                [s for s in static], 
-                [VariableLineItem(v.name) for v in variable]
-            )
+                [s for s in static], [VariableLineItem(v.name) for v in variable]
+            ),
         )
-    
+
     def assets_and_liabilities(self, month: MonthKey):
         budget = self.ledger.months.get(month)
         if budget:
@@ -121,7 +123,7 @@ class Data:
             for var in variable:
                 if var.name == name:
                     var.amount = amount
-    
+
     def get_variable(self, month, name):
         variable = self.ledger.months[month].variable
         for var in variable:

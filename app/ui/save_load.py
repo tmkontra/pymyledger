@@ -17,7 +17,9 @@ class SaveLoad(QtWidgets.QWidget):
     def _on_save_press(self):
         print("opening save dialog")
         homedir = str(Path.home())
-        (path, _) = QtWidgets.QFileDialog.getSaveFileName(self, "Save to file", homedir, "PyMyLedger files (*.pml)")
+        (path, _) = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Save to file", homedir, "PyMyLedger files (*.pml)"
+        )
         if path:
             try:
                 print("got path", path)
@@ -30,7 +32,9 @@ class SaveLoad(QtWidgets.QWidget):
     def _on_load_press(self):
         print("opening load dialog")
         homedir = str(Path.home())
-        (path, _) = QtWidgets.QFileDialog.getOpenFileName(self, "Save to file", homedir, "PyMyLedger files (*.pml)")
+        (path, _) = QtWidgets.QFileDialog.getOpenFileName(
+            self, "Save to file", homedir, "PyMyLedger files (*.pml)"
+        )
         if path:
             try:
                 data = Serializer(path).load()
@@ -40,5 +44,4 @@ class SaveLoad(QtWidgets.QWidget):
                 print("Unable to load data!")
                 raise
                 data = None
-            self.app.set_data(data)       
-  
+            self.app.set_data(data)

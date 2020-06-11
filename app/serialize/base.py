@@ -1,4 +1,3 @@
-
 class BaseSerializer:
     @classmethod
     def serialize_data(cls, data):

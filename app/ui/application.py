@@ -5,12 +5,20 @@ from PyQt5.QtCore import Qt
 from datetime import datetime
 import pprint
 
-from ..model import StaticLineItem, VariableLineItem, Ledger, Data, MonthBudget, MonthKey
+from ..model import (
+    StaticLineItem,
+    VariableLineItem,
+    Ledger,
+    Data,
+    MonthBudget,
+    MonthKey,
+)
 from .gen.ui_pyledger import Ui_PyLedger
 from .month_window import MonthWindow
 from .save_load import SaveLoad
 from .static_window import StaticWindow
 from .variable_window import VariableWindow
+
 
 class ApplicationWindow(QtWidgets.QMainWindow):
     _window_title = "PyMyLedger"
@@ -30,7 +38,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.ui.add_static.clicked.connect(self._on_new_static_press)
         self.ui.add_variable.clicked.connect(self._on_new_variable_press)
 
-        self.static_table = StaticTableManager(self.ui.static_table, self._on_static_check_state_change)
+        self.static_table = StaticTableManager(
+            self.ui.static_table, self._on_static_check_state_change
+        )
         self.variable_table = VariableTableManager(self.ui.variable_table)
 
         self.ui.month_select.currentTextChanged.connect(self._load_month)
@@ -49,8 +59,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             title = self._window_title + " | " + "PROFILE"
         else:
             title = self._window_title
-        self.setWindowTitle(title)        
-    
+        self.setWindowTitle(title)
+
     @property
     def _current_month(self):
         current_month_display = self.ui.month_select.currentText()
@@ -89,7 +99,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
     def _populate_month_select(self):
         print("populating month select")
-        index = self.ui.month_select.currentIndex() if self.ui.month_select.currentText() else None
+        index = (
+            self.ui.month_select.currentIndex()
+            if self.ui.month_select.currentText()
+            else None
+        )
         print("index", index)
         print("clearing month select")
         self.ui.month_select.clear()
@@ -110,6 +124,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
     def _add_static(self, dialog: QtWidgets.QDialog):
         c = lambda: self._current_month
+
         def try_add_variable(static):
             try:
                 self.data.add_static_to_month(c(), static)
@@ -117,20 +132,22 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                 dialog.close()
                 self._error_message("Cannot add duplicate item name!")
             self._load_month()
+
         return try_add_variable
 
     def _error_message(self, message):
         err = QtWidgets.QErrorMessage()
         err.showMessage(message)
         err.exec()
-    
+
     def _on_new_variable_press(self):
         dialog = VariableWindow(self._add_variable)
         dialog.setFocus()
         dialog.open()
-    
+
     def _add_variable(self, dialog: QtWidgets.QDialog):
         c = lambda: self._current_month
+
         def try_add_variable(variable):
             try:
                 self.data.add_variable_to_month(c(), variable)
@@ -138,20 +155,25 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                 dialog.close()
                 self._error_message("Cannot add duplicate item name!")
             self._load_month()
+
         return try_add_variable
 
     def _on_static_cell_change(self, row, column):
         if column == 1:
             item_name = self.ui.static_table.item(row, 0).text()
             updatedValue = self.ui.static_table.item(row, column).text()
-            self.data.update_static(self._current_month, item_name, amount=int(updatedValue))
+            self.data.update_static(
+                self._current_month, item_name, amount=int(updatedValue)
+            )
 
     def _on_static_check_state_change(self, item_name):
         c = lambda: self._current_month
+
         def change_state(check_state):
             new_state = bool(check_state)
             print(f"changing paid {item_name} to", new_state)
             self.data.update_static(c(), item_name, paid=new_state)
+
         return change_state
 
     def _on_variable_cell_change(self, row, column):
@@ -161,7 +183,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             if updated_value:
                 try:
                     new_val = int(updated_value)
-                    self.data.update_variable(self._current_month, item_name, amount=new_val)
+                    self.data.update_variable(
+                        self._current_month, item_name, amount=new_val
+                    )
                 except ValueError as e:
                     item = self.data.get_variable(self._current_month, item_name)
                     self.ui.variable_table.item(row, column).setText(str(item.amount))
@@ -176,9 +200,11 @@ class StaticTableManager:
 
     def _setup(self):
         self.table.setColumnCount(3)
-        self.table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.table.setHorizontalHeaderLabels(['Name', 'Amount', 'Paid'])
-    
+        self.table.horizontalHeader().setSectionResizeMode(
+            QtWidgets.QHeaderView.Stretch
+        )
+        self.table.setHorizontalHeaderLabels(["Name", "Amount", "Paid"])
+
     def add_items(self, items: list):
         self.table.setRowCount(len(items))
         for i, s in enumerate(items):
@@ -195,7 +221,7 @@ class StaticTableManager:
         paid.setCheckState(item.paid)
         paid.stateChanged.connect(self.check_callback(item.name))
         paid = self.create_row_widget(paid)
-    
+
         self.table.setItem(r, 0, name)
         self.table.setItem(r, 1, amt)
         self.table.setCellWidget(r, 2, paid)
@@ -217,9 +243,11 @@ class VariableTableManager:
 
     def _setup(self):
         self.table.setColumnCount(2)
-        self.table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.table.setHorizontalHeaderLabels(['Name', 'Amount'])
-    
+        self.table.horizontalHeader().setSectionResizeMode(
+            QtWidgets.QHeaderView.Stretch
+        )
+        self.table.setHorizontalHeaderLabels(["Name", "Amount"])
+
     def add_items(self, items: list):
         self.table.setRowCount(len(items))
         for i, s in enumerate(items):
