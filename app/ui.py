@@ -7,11 +7,12 @@ import signal
 from pathlib import Path
 import pprint
 
-from ui_pyledger import Ui_PyLedger
-from ui_add_month import Ui_AddMonth
-from ui_new_static import Ui_NewStatic
-from ui_new_variable import Ui_NewVariable
-from model import StaticLineItem, VariableLineItem, Ledger, Data, MonthBudget, MonthKey
+from .ui_pyledger import Ui_PyLedger
+from .ui_add_month import Ui_AddMonth
+from .ui_new_static import Ui_NewStatic
+from .ui_new_variable import Ui_NewVariable
+from .model import StaticLineItem, VariableLineItem, Ledger, Data, MonthBudget, MonthKey
+from .serialize import Serializer
 
 def date_from_qdatetime(qdt):
     return qdt.toPyDateTime().date()
@@ -23,7 +24,7 @@ def month_key_from_date(dt):
 class ApplicationWindow(QtWidgets.QMainWindow):
     _window_title = "PyMyLedger"
 
-    def __init__(self):
+    def __init__(self, save_func):
         super(ApplicationWindow, self).__init__()
 
         self.data: Data = None
@@ -32,7 +33,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self._set_window_title()
 
-        self.save_load = SaveLoad(self)
+        self.save_load = SaveLoad(self, save_func)
 
         self.ui.new_month.clicked.connect(self._on_new_month_press)
         self.ui.add_static.clicked.connect(self._on_new_static_press)
@@ -177,9 +178,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
 
 class SaveLoad(QtWidgets.QWidget):
-    def __init__(self, app, parent=None):
+    def __init__(self, app, save_func, parent=None):
         super(SaveLoad, self).__init__(parent)
         self.app = app
+        self.save_func = save_func
         self.app.ui.save_button.clicked.connect(self._on_save_press)
         self.app.ui.load_button.clicked.connect(self._on_load_press)
         self.last_opened = None
@@ -191,7 +193,7 @@ class SaveLoad(QtWidgets.QWidget):
         if path:
             try:
                 print("got path", path)
-                self.app.data.save(path)
+                self.save_func(path, self.app.data)
                 self.last_opened = path
             except Exception as e:
                 print("Unable to save data!")
@@ -203,7 +205,7 @@ class SaveLoad(QtWidgets.QWidget):
         (path, _) = QtWidgets.QFileDialog.getOpenFileName(self, "Save to file", homedir, "PyMyLedger files (*.pml)")
         if path:
             try:
-                data = Data.load(path)
+                data = Serializer(path).load()
                 print("loaded data:", data)
                 self.last_opened = path
             except Exception as e:

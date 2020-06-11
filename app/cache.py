@@ -1,7 +1,7 @@
 import sys
 import os
 from pathlib import Path
-import pickle 
+import json 
 
 if sys.platform.startswith('java'):
     import platform
@@ -48,7 +48,8 @@ class Cache:
     def __init__(self, appname):
         self._dir = user_cache_dir(appname)
         Path(self._dir).mkdir(exist_ok=True)
-        self._fp = os.path.join(self._dir, "app_data.pkl")
+        self._fp = os.path.join(self._dir, "app_data.json")
+        print(f"using cache location: {self._fp}")
         self.data = self.load()
 
     def update(self, key, value):
@@ -59,12 +60,12 @@ class Cache:
 
     def load(self):
         try:
-            with open(self._fp, 'rb') as f:
-                return pickle.load(f)
+            with open(self._fp, 'r') as f:
+                return json.load(f)
         except Exception as e:
             print("could not load application cache", e)
             return {}
 
     def flush(self):
-        with open(self._fp, 'wb') as f:
-            pickle.dump(self.data, f)
+        with open(self._fp, 'w') as f:
+            json.dump(self.data, f)

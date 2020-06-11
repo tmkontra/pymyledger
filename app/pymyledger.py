@@ -1,11 +1,13 @@
 from datetime import datetime
 import signal
+import traceback
+
 from PyQt5 import QtWidgets, QtCore
 
-from ui import ApplicationWindow, MonthWindow
-
-from cache import Cache
-from model import Data, Ledger, MonthKey
+from .cache import Cache
+from .model import Data, Ledger, MonthKey
+from .serialize import Serializer
+from .ui import ApplicationWindow, MonthWindow
 
 class PyMyLedger:
     _default_profile_name = "My Profile"
@@ -20,14 +22,12 @@ class PyMyLedger:
 
         last_open = self.cache.get("last_opened")
         if last_open:
-            try:
-                data = Data.load(last_open)
-            except:
-                data = None
+            data = self.load(last_open)
         else:
             data = None
 
-        self._window: ApplicationWindow = ApplicationWindow()
+        save_func = lambda fp, d: Serializer(fp).save(d)
+        self._window: ApplicationWindow = ApplicationWindow(save_func)
         self._set_data(data)
         self._register_signal_handlers()
         self._start_timer()
@@ -57,6 +57,14 @@ class PyMyLedger:
         print("initializing data...")
         data = Data(Ledger())
         return data
+    
+    def load(self, fp):
+        try:
+            return Serializer(fp).load()
+        except Exception as e:
+            print("ERROR loading file", fp)
+            traceback.print_exc()
+            return None
 
     def _register_signal_handlers(self):
         signal.signal(signal.SIGINT, self.sigint_handler)

@@ -1,10 +1,9 @@
+from copy import deepcopy
 from dataclasses import dataclass, field
 import datetime
 import itertools
-import pickle
-from typing import List
-
-from copy import deepcopy
+import json
+from typing import List, Mapping
 
 
 @dataclass(frozen=True)
@@ -30,15 +29,18 @@ class MonthKey:
             return MonthKey(self.year, self.month - 1)
         else:
             return MonthKey(self.year - 1, 12)
+            
 
 @dataclass
 class LineItem:
     name: str
     amount: float = 0
 
+
 @dataclass
 class StaticLineItem(LineItem):
     paid: bool = False
+
 
 @dataclass
 class VariableLineItem(LineItem):
@@ -52,7 +54,7 @@ class MonthBudget:
 
 @dataclass
 class Ledger:
-    months: dict = field(default_factory=dict)
+    months: Mapping[MonthKey, MonthBudget] = field(default_factory=dict)
 
 
 @dataclass
@@ -138,13 +140,3 @@ class Data:
         for stat in static:
             if stat.name == name:
                 return stat
-
-    def save(self, fp):
-        with open(fp, 'wb') as f:
-            pickle.dump(self, f)
-    
-    @classmethod
-    def load(cls, fp):
-        with open(fp, 'rb') as f:
-            data = pickle.load(f)
-        return data
