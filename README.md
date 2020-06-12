@@ -19,24 +19,29 @@ Serialization (save/load) is implemented via naive pickle.
 
 ## Installation
 
-At present, there is no graphical installer or package distribution of PyMyLedger.
+You can check the releases page for bundled installations.
 
-To install PyMyLedger:
+Alternatively, you can install/run the application directly from a git clone:
 
 1. Clone/download this repo
 2. Run `pipenv install` in the repo root.
 
 To run PyMyLedger:
 
-> `pipenv run python app/main.py`
+> `pipenv run python PyMyLedger.py`
 
 ## Roadmap
 
-- Finish save/load functionality
-- Create distribution executable (cross-platform)
-- Add import/export format (yaml? xlsx?)
-- Add confirmation dialogs
-- Implement visualizations
+### In Progress
+
+- [x] Finish save/load functionality
+- [ ] Create distribution executable (cross-platform)
+
+### Todo
+
+- [ ] Add import/export format (yaml? xlsx?)
+- [ ] Add confirmation dialogs
+- [ ] Implement visualizations
 
 ## Background
 
