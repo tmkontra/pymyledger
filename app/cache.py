@@ -25,13 +25,36 @@ else:
     system = sys.platform
 
 
+def _get_win_folder_from_registry(csidl_name):
+    """This is a fallback technique at best. I'm not sure if using the
+    registry for this guarantees us the correct answer for all CSIDL_*
+    names.
+    """
+    # pylint: disable=C0415,E0401
+    import winreg as _winreg
+
+    shell_folder_name = {
+        "CSIDL_APPDATA": "AppData",
+        "CSIDL_COMMON_APPDATA": "Common AppData",
+        "CSIDL_LOCAL_APPDATA": "Local AppData",
+    }[csidl_name]
+
+    key = _winreg.OpenKey(
+        _winreg.HKEY_CURRENT_USER,
+        r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders"
+    )
+    # pylint: disable=W0622
+    dir, _ = _winreg.QueryValueEx(key, shell_folder_name)
+    return dir
+
+
 def user_cache_dir(appname=None, appauthor=None, version=None, opinion=True):
     r"Return full path to the user-specific cache dir for this application."
 
     if system == "win32":
         if appauthor is None:
             appauthor = appname
-        path = os.path.normpath(_get_win_folder("CSIDL_LOCAL_APPDATA"))
+        path = os.path.normpath(_get_win_folder_from_registry("CSIDL_LOCAL_APPDATA"))
         if appname:
             if appauthor is not False:
                 path = os.path.join(path, appauthor, appname)
@@ -72,7 +95,7 @@ class Cache:
             logger.info("Loading cache from %s", self._fp)
             with open(self._fp, "r") as f:
                 return json.load(f)
-        except Exception as e:
+        except Exception:
             logger.exception("Could not load application cache")
             return {}
 

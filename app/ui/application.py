@@ -1,16 +1,11 @@
-from PyQt5 import QtWidgets, uic, QtGui
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
-
 from datetime import datetime
 import logging
 
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
+
 from ..model import (
-    StaticLineItem,
-    VariableLineItem,
-    Ledger,
     Data,
-    MonthBudget,
     MonthKey,
 )
 from .gen.ui_pyledger import Ui_PyLedger
@@ -73,7 +68,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             return key
         return None
 
-    def _month_display_as_date(self, month_display):
+    @staticmethod
+    def _month_display_as_date(month_display):
         return datetime.strptime(month_display, MonthKey.month_format()).date()
 
     def _load_month(self, *args):
@@ -91,8 +87,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.ui.liabilities_text.setText(str(liabilities))
         self.ui.balance_text.setText(str(balance))
 
-    def _on_new_month_press(self, instruction=None):
+    def month_select(self, instruction):
         dialog = MonthWindow(self._add_month, instruction)
+        dialog.open()
+
+    def _on_new_month_press(self):
+        dialog = MonthWindow(self._add_month)
         dialog.open()
 
     def _add_month(self, date):
@@ -126,7 +126,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         def try_add_variable(static):
             try:
                 self.data.add_static_to_month(c(), static)
-            except ValueError as e:
+            except ValueError:
                 logger.exception("Unable to add static line item")
                 dialog.close()
                 self._error_message("Cannot add duplicate item name!")
@@ -134,7 +134,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         return try_add_variable
 
-    def _error_message(self, message):
+    @staticmethod
+    def _error_message(message):
         err = QtWidgets.QErrorMessage()
         err.showMessage(message)
         err.exec()
@@ -150,7 +151,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         def try_add_variable(variable):
             try:
                 self.data.add_variable_to_month(c(), variable)
-            except ValueError as e:
+            except ValueError:
                 logger.exception("Unable to add variable line item")
                 dialog.close()
                 self._error_message("Cannot add duplicate item name!")
@@ -186,7 +187,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                     self.data.update_variable(
                         self._current_month, item_name, amount=new_val
                     )
-                except ValueError as e:
+                except ValueError:
                     logger.exception("Unable to set cell")
                     item = self.data.get_variable(self._current_month, item_name)
                     self.ui.variable_table.item(row, column).setText(str(item.amount))

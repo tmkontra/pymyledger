@@ -1,14 +1,12 @@
-from datetime import datetime
 import logging
 import signal
-import traceback
 
 from PyQt5 import QtWidgets, QtCore
 
 from .cache import Cache
-from .model import Data, Ledger, MonthKey
+from .model import Data, Ledger
 from .serialize import Serializer
-from .ui import ApplicationWindow, MonthWindow
+from .ui import ApplicationWindow
 
 
 logger = logging.getLogger(__name__)
@@ -27,7 +25,7 @@ class PyMyLedger:
 
         last_open = self.cache.get("last_opened")
         if last_open:
-            data = self.load(last_open)
+            data = self._load(last_open)
         else:
             data = None
 
@@ -48,7 +46,7 @@ class PyMyLedger:
             needs_month = False
         self._window.set_data(data)
         if needs_month:
-            self._window._on_new_month_press("Please Select A Month To Start:")
+            self._window.month_select("Please Select A Month To Start:")
 
     def on_shutdown(self):
         lo = self._window.save_load.last_opened
@@ -63,11 +61,12 @@ class PyMyLedger:
         data = Data(Ledger())
         return data
 
-    def load(self, fp):
+    @staticmethod
+    def _load(fp):
         try:
             logger.info("Loading data from %s", fp)
             return Serializer(fp).load()
-        except Exception as e:
+        except Exception:
             logger.exception("Error loading file %s", fp)
             return None
 

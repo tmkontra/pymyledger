@@ -33,7 +33,8 @@ class MonthWindow(QtWidgets.QDialog):
     def open(self):
         self.exec()
 
-    def _on_cancel(self, *args, **kwargs):
+    @staticmethod
+    def _on_cancel(*args, **kwargs):
         logger.debug("Canceled month select")
 
     def _on_new_month_select(self, *args, **kwargs):

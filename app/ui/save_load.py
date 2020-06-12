@@ -29,7 +29,7 @@ class SaveLoad(QtWidgets.QWidget):
                 logger.info("Got save path %s", path)
                 self.save_func(path, self.app.data)
                 self.last_opened = path
-            except Exception as e:
+            except Exception:
                 logger.exception("Unable to save data!")
                 raise
 
@@ -45,7 +45,7 @@ class SaveLoad(QtWidgets.QWidget):
                 data = Serializer(path).load()
                 logger.debug("Loaded data: %s", data)
                 self.last_opened = path
-            except Exception as e:
+            except Exception:
                 logger.exception("Unable to load data!")
                 raise
             self.app.set_data(data)

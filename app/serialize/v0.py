@@ -71,6 +71,6 @@ class SerializerV0(BaseSerializer):
         st = month["static"]
         vr = month["variable"]
         return MonthBudget(
-            [Static(s["name"], s["amount"], s["paid"]) for s in st],
-            [VariableLineItem(s["name"], s["amount"]) for v in vr],
+            [StaticLineItem(s["name"], s["amount"], s["paid"]) for s in st],
+            [VariableLineItem(v["name"], v["amount"]) for v in vr],
         )

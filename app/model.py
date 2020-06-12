@@ -1,8 +1,6 @@
-from copy import deepcopy
 from dataclasses import dataclass, field
 import datetime
 import itertools
-import json
 from typing import List, Mapping
 
 
@@ -29,8 +27,7 @@ class MonthKey:
     def prev(self):
         if self.month > 1:
             return MonthKey(self.year, self.month - 1)
-        else:
-            return MonthKey(self.year - 1, 12)
+        return MonthKey(self.year - 1, 12)
 
 
 @dataclass
@@ -69,7 +66,8 @@ class Data:
         self.ledger.months.setdefault(
             month,
             MonthBudget(
-                [s for s in static], [VariableLineItem(v.name) for v in variable]
+                [StaticLineItem(s.name, s.amount) for s in static],
+                [VariableLineItem(v.name) for v in variable]
             ),
         )
 
@@ -83,8 +81,7 @@ class Data:
                 if i.amount < 0:
                     liabilities -= i.amount
             return assets, liabilities
-        else:
-            return None
+        return None
 
     def static_and_variable(self, month: MonthKey):
         budget = self.ledger.months.get(month)
@@ -106,16 +103,14 @@ class Data:
     def add_static_to_month(self, month, static):
         static_list, _ = self.static_and_variable(month)
         if static.name in static_list:
-            raise ValueError("%s already exists", static.name)
-        else:
-            static_list.append(static)
+            raise ValueError("%s already exists" % static.name)
+        static_list.append(static)
 
     def add_variable_to_month(self, month, variable):
         _, variable_list = self.static_and_variable(month)
         if variable.name in variable_list:
-            raise ValueError("%s already exists", variable.name)
-        else:
-            variable_list.append(variable)
+            raise ValueError("%s already exists" % variable.name)
+        variable_list.append(variable)
 
     def update_variable(self, month, name, amount=None):
         if amount:
@@ -129,6 +124,7 @@ class Data:
         for var in variable:
             if var.name == name:
                 return var
+        return None
 
     def update_static(self, month, name, amount=None, paid=None):
         static = self.ledger.months[month].static
@@ -142,3 +138,4 @@ class Data:
         for stat in static:
             if stat.name == name:
                 return stat
+        return None
