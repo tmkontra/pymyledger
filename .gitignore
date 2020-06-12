@@ -1,3 +1,6 @@
 *.DS_Store
 .vscode
 *.pml
+*.spec
+build/
+dist/
