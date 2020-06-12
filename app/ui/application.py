@@ -3,7 +3,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 
 from datetime import datetime
-import pprint
+import logging
 
 from ..model import (
     StaticLineItem,
@@ -20,10 +20,14 @@ from .static_window import StaticWindow
 from .variable_window import VariableWindow
 
 
+logger = logging.getLogger(__name__)
+
+
 class ApplicationWindow(QtWidgets.QMainWindow):
     _window_title = "PyMyLedger"
 
     def __init__(self, save_func):
+        logger.debug("Loading ApplicationWindow")
         super(ApplicationWindow, self).__init__()
 
         self.data: Data = None
@@ -93,29 +97,23 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
     def _add_month(self, date):
         month_key = MonthKey.from_date(date)
-        print("adding month:", month_key)
+        logger.info("Adding month: %s", month_key)
         self.data.add_month(month_key)
         self.set_data()
 
     def _populate_month_select(self):
-        print("populating month select")
+        logger.debug("Populating month select")
         index = (
             self.ui.month_select.currentIndex()
             if self.ui.month_select.currentText()
             else None
         )
-        print("index", index)
-        print("clearing month select")
         self.ui.month_select.clear()
-        print("adding months")
         for key in self.data.months_available:
-            print("got key", key)
             month_str = key.display
-            print("adding month to select:", month_str)
             self.ui.month_select.addItem(month_str)
         if index is None:
             index = 0
-        print("setting month index", index)
         self.ui.month_select.setCurrentIndex(index)
 
     def _on_new_static_press(self):
@@ -128,7 +126,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         def try_add_variable(static):
             try:
                 self.data.add_static_to_month(c(), static)
-            except ValueError:
+            except ValueError as e:
+                logger.exception("Unable to add static line item")
                 dialog.close()
                 self._error_message("Cannot add duplicate item name!")
             self._load_month()
@@ -151,7 +150,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         def try_add_variable(variable):
             try:
                 self.data.add_variable_to_month(c(), variable)
-            except ValueError:
+            except ValueError as e:
+                logger.exception("Unable to add variable line item")
                 dialog.close()
                 self._error_message("Cannot add duplicate item name!")
             self._load_month()
@@ -171,7 +171,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         def change_state(check_state):
             new_state = bool(check_state)
-            print(f"changing paid {item_name} to", new_state)
+            logger.debug("Changing paid for %s to %s", item_name, new_state)
             self.data.update_static(c(), item_name, paid=new_state)
 
         return change_state
@@ -187,6 +187,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                         self._current_month, item_name, amount=new_val
                     )
                 except ValueError as e:
+                    logger.exception("Unable to set cell")
                     item = self.data.get_variable(self._current_month, item_name)
                     self.ui.variable_table.item(row, column).setText(str(item.amount))
                     self._error_message("Amount must be an integer!")

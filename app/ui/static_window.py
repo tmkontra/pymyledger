@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets
 
+from ..model import StaticLineItem
 from .gen.ui_new_static import Ui_NewStatic
 
 

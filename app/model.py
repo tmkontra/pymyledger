@@ -106,14 +106,14 @@ class Data:
     def add_static_to_month(self, month, static):
         static_list, _ = self.static_and_variable(month)
         if static.name in static_list:
-            raise ValueError
+            raise ValueError("%s already exists", static.name)
         else:
             static_list.append(static)
 
     def add_variable_to_month(self, month, variable):
         _, variable_list = self.static_and_variable(month)
         if variable.name in variable_list:
-            raise ValueError
+            raise ValueError("%s already exists", variable.name)
         else:
             variable_list.append(variable)
 

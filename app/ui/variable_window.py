@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets
 
+from ..model import VariableLineItem
 from .gen.ui_new_variable import Ui_NewVariable
 
 

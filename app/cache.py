@@ -1,7 +1,12 @@
+import logging
 import sys
 import os
 from pathlib import Path
 import json
+
+
+logger = logging.getLogger(__name__)
+
 
 if sys.platform.startswith("java"):
     import platform
@@ -52,23 +57,26 @@ class Cache:
         self._dir = user_cache_dir(appname)
         Path(self._dir).mkdir(exist_ok=True)
         self._fp = os.path.join(self._dir, "app_data.json")
-        print(f"using cache location: {self._fp}")
+        logger.info("Using cache location %s", self._fp)
         self.data = self.load()
 
     def update(self, key, value):
         self.data[key] = value
 
     def get(self, key):
+        logger.debug("Getting '%s'", key)
         return self.data.get(key)
 
     def load(self):
         try:
+            logger.info("Loading cache from %s", self._fp)
             with open(self._fp, "r") as f:
                 return json.load(f)
         except Exception as e:
-            print("could not load application cache", e)
+            logger.exception("Could not load application cache")
             return {}
 
     def flush(self):
+        logger.info("Saving cache to %s", self._fp)
         with open(self._fp, "w") as f:
             json.dump(self.data, f)

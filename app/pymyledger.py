@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 import signal
 import traceback
 
@@ -8,6 +9,9 @@ from .cache import Cache
 from .model import Data, Ledger, MonthKey
 from .serialize import Serializer
 from .ui import ApplicationWindow, MonthWindow
+
+
+logger = logging.getLogger(__name__)
 
 
 class PyMyLedger:
@@ -49,22 +53,22 @@ class PyMyLedger:
     def on_shutdown(self):
         lo = self._window.save_load.last_opened
         if lo:
-            print("caching last file location")
+            logger.info("Caching last file location %s", lo)
             self.cache.update("last_opened", lo)
             self.cache.flush()
 
     @property
     def default_data(self):
-        print("initializing data...")
+        logger.debug("Initializing default data")
         data = Data(Ledger())
         return data
 
     def load(self, fp):
         try:
+            logger.info("Loading data from %s", fp)
             return Serializer(fp).load()
         except Exception as e:
-            print("ERROR loading file", fp)
-            traceback.print_exc()
+            logger.exception("Error loading file %s", fp)
             return None
 
     def _register_signal_handlers(self):
@@ -74,18 +78,18 @@ class PyMyLedger:
     @staticmethod
     def sigint_handler(*args):
         """Handler for the SIGINT signal."""
-        print("Goodbye!")
+        logger.debug("Goodbye!")
         QtWidgets.QApplication.quit()
 
     def sigquit_handler(self, *args):
-        print("\n")
-        print("Profile")
-        print(self._window.data.profile.__dict__)
-        print("Ledger")
+        logger.debug("\n")
+        logger.debug("Profile")
+        logger.debug(self._window.data.profile.__dict__)
+        logger.debug("Ledger")
         for m, v in self._window.data.ledger.months.items():
-            print(m)
-            print(v)
-        print("\n")
+            logger.debug(m)
+            logger.debug(v)
+        logger.debug("\n")
 
     def _start_timer(self):
         timer = QtCore.QTimer()
